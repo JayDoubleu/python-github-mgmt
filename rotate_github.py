@@ -1,9 +1,15 @@
 import re
+import time
 import requests
+import pyotp
 from bs4 import BeautifulSoup
 
 
-def rotate_github_password(username, password, new_password):
+def get_otp(secret):
+    return pyotp.TOTP(secret).now()
+
+
+def rotate_github_password(username, password, new_password, secret):
     try:
         url = 'https://github.com'
         s = requests.Session()
@@ -29,6 +35,16 @@ def rotate_github_password(username, password, new_password):
         login_response = s.post(url + '/session', data=data).content
 
         soup = BeautifulSoup(login_response, features='html.parser')
+        token = soup.find('input', {'name': 'authenticity_token'}).get('value')
+
+        data = {
+            'utf8': '✓',
+            'authenticity_token': token,
+            'otp': get_otp(secret)
+        }
+        otp_response = s.post(url + '/sessions/two-factor', data=data).content
+
+        soup = BeautifulSoup(otp_response, features='html.parser')
         pwd_form = soup.find('form', {'class': 'edit_user'})
         token = pwd_form.find('input', {
             'name': 'authenticity_token'
@@ -61,4 +77,4 @@ def rotate_github_password(username, password, new_password):
         raise Exception(e)
 
 
-rotate = rotate_github_password('username', 'old_pwd', 'new_pwd')
+rotate = rotate_github_password('username', 'old_pwd', 'new_pwd', 'otp_secret')
