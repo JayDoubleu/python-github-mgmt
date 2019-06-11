@@ -17,9 +17,13 @@ for authorization in authorizations:
     gmgmt.delete_authorization(authorization['id'])
 ```
 
+https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/
+https://developer.github.com/v3/oauth_authorizations/#create-a-new-authorization
+
 ```python
 data = {"scopes": ["repo"], "note": "admin script"}
-gmgmt.create_authorization(data)
+authorization = gmgmt.create_authorization(data)
+oauth_token = authorization['token']
 ```
 
 ```python
