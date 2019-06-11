@@ -5,7 +5,7 @@ Python script to manage github account
 from github_mgmt import Github_mgmt
 gmgmt = Github_mgmt(github_username='username',
                     github_password='password',
-                    github_otp_secret='otp_token')
+                    github_otp_secret='otp_secret')
 ```
 
 ```python
